@@ -24,7 +24,7 @@ function UserHome() {
 
     const fetchRegisteredCodes = async () => {
         try {
-            const response = await fetch('http://backend-gana-como-loco.vercel.app/v1/codigos/registrados', {
+            const response = await fetch('https://backend-gana-como-loco.vercel.app/v1/codigos/registrados', {
                 headers: {
                     'Authorization': `Bearer ${token}` // Asegúrate de que el token se esté pasando correctamente
                 }
