@@ -77,7 +77,7 @@ function UserHome() {
 
     return (
         <div>
-            <h1>Panel de Usuario</h1>
+            <h1>Bienvenido a gana como loco, registra tu codigo de 2 digitos abajo</h1>
 
             <form onSubmit={handleSubmit}>
                 <input
