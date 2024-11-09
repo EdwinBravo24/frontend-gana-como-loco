@@ -51,7 +51,7 @@ function UserHome() {
         }
 
         try {
-            const response = await fetch('http://localhost:4000/v1/codigos/ingresar', {
+            const response = await fetch('https://backend-gana-como-loco.vercel.app/v1/codigos/ingresar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
