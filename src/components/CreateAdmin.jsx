@@ -22,7 +22,7 @@ function CreateAdmin() {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch('http://localhost:4000/v1/users/registerAdmin', {
+            const response = await fetch('http://backend-gana-como-loco.vercel.app/v1/users/registerAdmin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

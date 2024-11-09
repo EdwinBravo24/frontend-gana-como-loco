@@ -19,7 +19,7 @@ function AdminHome() {
 
     const fetchWinners = async () => {
         try {
-            const response = await fetch('http://localhost:4000/v1/intentos/usuario', {
+            const response = await fetch('https://backend-gana-como-loco.vercel.app/v1/intentos/usuario', {
                 headers: {
                     'Authorization': `Bearer ${token}` // Token para autenticar
                 }
