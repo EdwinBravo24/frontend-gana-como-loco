@@ -1,4 +1,3 @@
-// adminhome.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -12,31 +11,28 @@ const AdminHome = () => {
         console.error("Token no encontrado.");
         return;
       }
-  
+
       try {
         const { data } = await axios.get("https://backend-gana-como-loco.vercel.app/v1/archivos/general", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Archivos obtenidos:", data.archivos);
         setArchivos(data.archivos || []);
       } catch (error) {
         console.error("Error al obtener los archivos generales:", error.response?.data || error.message);
       }
     };
-  
+
     obtenerArchivosGenerales();
   }, [token]);
-  
+
   const renderArchivo = (archivo) => {
     const ext = archivo.nombreOriginal.split(".").pop().toLowerCase();
 
-    // Si el archivo es una imagen, lo mostramos con <img>
-    if (ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "gif") {
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
       return <img src={archivo.url} alt={archivo.nombreOriginal} style={{ maxWidth: "300px", maxHeight: "300px" }} />;
     }
 
-    // Si el archivo es un video, lo mostramos con <video>
-    if (ext === "mp4" || ext === "webm" || ext === "ogg") {
+    if (["mp4", "webm", "ogg"].includes(ext)) {
       return (
         <video width="300" height="300" controls>
           <source src={archivo.url} type={`video/${ext}`} />
@@ -45,8 +41,7 @@ const AdminHome = () => {
       );
     }
 
-    // Si el archivo es un audio, lo mostramos con <audio>
-    if (ext === "mp3" || ext === "wav" || ext === "ogg") {
+    if (["mp3", "wav", "ogg"].includes(ext)) {
       return (
         <audio controls>
           <source src={archivo.url} type={`audio/${ext}`} />
@@ -55,7 +50,6 @@ const AdminHome = () => {
       );
     }
 
-    // Otros tipos de archivo: mostramos solo el enlace
     return (
       <a href={archivo.url} target="_blank" rel="noopener noreferrer">
         Ver archivo: {archivo.nombreOriginal}

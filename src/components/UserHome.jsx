@@ -20,13 +20,13 @@ const UserHome = () => {
     };
     obtenerArchivos();
   }, [token]);
-  
+
   const handleSubirArchivo = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("archivo", archivo);
     formData.append("titulo", titulo);
-  
+
     try {
       const response = await axios.post(
         "https://backend-gana-como-loco.vercel.app/v1/archivos/subir",
@@ -35,37 +35,30 @@ const UserHome = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
-      // Aseguramos que cualquier respuesta exitosa (200, 201) muestre la alerta correcta
+
       if (response.status === 200 || response.status === 201) {
         alert("Archivo subido exitosamente");
         setArchivo(null);
         setTitulo("");
-        window.location.reload(); // Recargar para reflejar los cambios
+        window.location.reload();
       } else {
         console.warn("Respuesta inesperada:", response);
-        alert("Hubo un problema con la subida, pero no se detectó un error.");
+        alert("Hubo un problema con la subida.");
       }
     } catch (error) {
       console.error("Error al subir el archivo:", error);
-      if (error.response) {
-        console.error("Detalles del error:", error.response.data);
-      }
       alert("Hubo un error al subir el archivo.");
     }
   };
-  
 
   const renderArchivo = (archivo) => {
     const ext = archivo.nombreOriginal.split(".").pop().toLowerCase();
 
-    // Si el archivo es una imagen, lo mostramos con <img>
-    if (ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "gif") {
+    if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
       return <img src={archivo.url} alt={archivo.nombreOriginal} style={{ maxWidth: "300px", maxHeight: "300px" }} />;
     }
 
-    // Si el archivo es un video, lo mostramos con <video>
-    if (ext === "mp4" || ext === "webm" || ext === "ogg") {
+    if (["mp4", "webm", "ogg"].includes(ext)) {
       return (
         <video width="300" height="300" controls>
           <source src={archivo.url} type={`video/${ext}`} />
@@ -74,8 +67,7 @@ const UserHome = () => {
       );
     }
 
-    // Si el archivo es un audio, lo mostramos con <audio>
-    if (ext === "mp3" || ext === "wav" || ext === "ogg") {
+    if (["mp3", "wav", "ogg"].includes(ext)) {
       return (
         <audio controls>
           <source src={archivo.url} type={`audio/${ext}`} />
@@ -84,7 +76,6 @@ const UserHome = () => {
       );
     }
 
-    // Otros tipos de archivo: mostramos solo el enlace
     return (
       <a href={archivo.url} target="_blank" rel="noopener noreferrer">
         Ver archivo: {archivo.nombreOriginal}
@@ -123,7 +114,6 @@ const UserHome = () => {
   );
 };
 
-// Función para eliminar archivos
 const eliminarArchivo = async (id) => {
   const token = localStorage.getItem("token");
   if (window.confirm("¿Seguro que quieres eliminar este archivo?")) {
