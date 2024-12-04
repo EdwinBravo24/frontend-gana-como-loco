@@ -26,23 +26,35 @@ const UserHome = () => {
     const formData = new FormData();
     formData.append("archivo", archivo);
     formData.append("titulo", titulo);
-    
+  
     try {
-      const response = await axios.post("https://backend-gana-como-loco.vercel.app/v1/archivos/subir", formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // Verificamos la respuesta para asegurarnos que el archivo fue subido correctamente
-      if (response.status === 200) {
+      const response = await axios.post(
+        "https://backend-gana-como-loco.vercel.app/v1/archivos/subir",
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      // Aseguramos que cualquier respuesta exitosa (200, 201) muestre la alerta correcta
+      if (response.status === 200 || response.status === 201) {
         alert("Archivo subido exitosamente");
         setArchivo(null);
         setTitulo("");
-        window.location.reload();  // Recargamos para mostrar el archivo recién subido
+        window.location.reload(); // Recargar para reflejar los cambios
+      } else {
+        console.warn("Respuesta inesperada:", response);
+        alert("Hubo un problema con la subida, pero no se detectó un error.");
       }
     } catch (error) {
-      console.error("Error al subir el archivo:", error.response?.data || error.message);
+      console.error("Error al subir el archivo:", error);
+      if (error.response) {
+        console.error("Detalles del error:", error.response.data);
+      }
       alert("Hubo un error al subir el archivo.");
     }
   };
+  
 
   const renderArchivo = (archivo) => {
     const ext = archivo.nombreOriginal.split(".").pop().toLowerCase();
