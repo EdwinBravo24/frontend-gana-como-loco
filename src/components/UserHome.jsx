@@ -10,7 +10,7 @@ const UserHome = () => {
   useEffect(() => {
     const obtenerArchivos = async () => {
       try {
-        const { data } = await axios.get("https://backend-gana-como-loco.vercel.app/muro", {
+        const { data } = await axios.get("https://backend-gana-como-loco.vercel.app/v1/archivos/muro", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setArchivos(data.archivos);
