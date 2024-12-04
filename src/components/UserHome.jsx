@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import './styles/UserHome.css';
 
 const UserHome = () => {
   const [archivos, setArchivos] = useState([]);
@@ -27,16 +26,21 @@ const UserHome = () => {
     const formData = new FormData();
     formData.append("archivo", archivo);
     formData.append("titulo", titulo);
+    
     try {
-      await axios.post("https://backend-gana-como-loco.vercel.app/v1/archivos/subir", formData, {
+      const response = await axios.post("https://backend-gana-como-loco.vercel.app/v1/archivos/subir", formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert("Archivo subido exitosamente");
-      setArchivo(null);
-      setTitulo("");
-      window.location.reload();
+      // Verificamos la respuesta para asegurarnos que el archivo fue subido correctamente
+      if (response.status === 200) {
+        alert("Archivo subido exitosamente");
+        setArchivo(null);
+        setTitulo("");
+        window.location.reload();  // Recargamos para mostrar el archivo recién subido
+      }
     } catch (error) {
-      console.error("Error al subir el archivo:", error.response?.data);
+      console.error("Error al subir el archivo:", error.response?.data || error.message);
+      alert("Hubo un error al subir el archivo.");
     }
   };
 
