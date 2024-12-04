@@ -1,132 +1,126 @@
-// vista para ingresar los codigos.
-// UserHome.jsx
-// UserHome.jsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-import { useState, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
-import './styles/UserHome.css';
+const UserHome = () => {
+  const [archivos, setArchivos] = useState([]);
+  const [titulo, setTitulo] = useState("");
+  const [archivo, setArchivo] = useState(null);
+  const token = localStorage.getItem("token");
 
-function UserHome() {
-    const [code, setCode] = useState('');
-    const [registeredCodes, setRegisteredCodes] = useState([]);
-    const navigate = useNavigate();
-    const role = localStorage.getItem('role');
-    const token = localStorage.getItem('token');
+  useEffect(() => {
+    const obtenerArchivos = async () => {
+      try {
+        const { data } = await axios.get("https://backend-noutube.vercel.app/v1/archivos/muro", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setArchivos(data.archivos);
+      } catch (error) {
+        console.error("Error al obtener los archivos:", error.response?.data);
+      }
+    };
+    obtenerArchivos();
+  }, [token]);
+  
+  const handleSubirArchivo = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("archivo", archivo);
+    formData.append("titulo", titulo);
+    try {
+      await axios.post("https://backend-noutube.vercel.app/v1/archivos/subir", formData, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true // Añadido para CORS
+      });
+      alert("Archivo subido exitosamente");
+      setArchivo(null);
+      setTitulo("");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al subir el archivo:", error.response?.data);
+    }
+  };
 
-    // Redirige si no hay token o el rol no es 'user'
-    if (!token || role !== 'user') {
-        return <Navigate to="/" />;
+  const renderArchivo = (archivo) => {
+    const ext = archivo.nombreOriginal.split(".").pop().toLowerCase();
+
+    // Si el archivo es una imagen, lo mostramos con <img>
+    if (ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "gif") {
+      return <img src={archivo.url} alt={archivo.nombreOriginal} style={{ maxWidth: "300px", maxHeight: "300px" }} />;
     }
 
-    useEffect(() => {
-        fetchRegisteredCodes();
-    }, []);
+    // Si el archivo es un video, lo mostramos con <video>
+    if (ext === "mp4" || ext === "webm" || ext === "ogg") {
+      return (
+        <video width="300" height="300" controls>
+          <source src={archivo.url} type={`video/${ext}`} />
+          Tu navegador no soporta el elemento de video.
+        </video>
+      );
+    }
 
-    const fetchRegisteredCodes = async () => {
-        try {
-            const response = await fetch('https://backend-gana-como-loco.vercel.app/v1/codigos/registrados', {
-                headers: {
-                    'Authorization': `Bearer ${token}` // Asegúrate de que el token se esté pasando correctamente
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setRegisteredCodes(data); // Guarda los códigos obtenidos
-            } else {
-                console.error('Error al obtener códigos:', response.statusText);
-                alert('No se han encontrado códigos registrados');
-            }
-        } catch (error) {
-            console.error('Error al obtener códigos:', error);
-            alert('Error al obtener los códigos registrados');
-        }
-    };
+    // Si el archivo es un audio, lo mostramos con <audio>
+    if (ext === "mp3" || ext === "wav" || ext === "ogg") {
+      return (
+        <audio controls>
+          <source src={archivo.url} type={`audio/${ext}`} />
+          Tu navegador no soporta el elemento de audio.
+        </audio>
+      );
+    }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        if (code.length !== 2 || isNaN(code)) {
-            alert('Por favor ingrese un código válido de dos dígitos');
-            return;
-        }
-
-        try {
-            const response = await fetch('https://backend-gana-como-loco.vercel.app/v1/codigos/ingresar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ codigo: code }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert(data.mensaje);
-                setCode('');
-                fetchRegisteredCodes(); // Actualiza la lista de códigos después de registrar uno nuevo
-            } else {
-                alert(data.mensaje);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error al procesar el código');
-        }
-    };
-
+    // Otros tipos de archivo: mostramos solo el enlace
     return (
-        <div>
-            <h1>Bienvenido a gana como loco, registra tu codigo de 2 digitos abajo</h1>
-
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="Ingrese código de 2 dígitos"
-                    maxLength="2"
-                    pattern="\d{2}"
-                    required
-                />
-                <button type="submit">Registrar Código</button>
-            </form>
-
-            <h2>Códigos Registrados</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Fecha de Registro</th>
-                        <th>Premio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {registeredCodes.length > 0 ? (
-                        registeredCodes.map((registro, index) => (
-                            <tr key={index}>
-                                <td>{registro.codigo}</td>
-                                <td>{new Date(registro.fechaRegistro).toLocaleString()}</td>
-                                <td>{registro.premio}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="3">No tienes códigos registrados.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-
-            <button onClick={fetchRegisteredCodes}>Actualizar</button>
-
-            <button onClick={() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('role');
-                navigate('/');
-            }}>Cerrar Sesión</button>
-        </div>
+      <a href={archivo.url} target="_blank" rel="noopener noreferrer">
+        Ver archivo: {archivo.nombreOriginal}
+      </a>
     );
-}
+  };
+
+  return (
+    <div>
+      <h1>Mi Muro</h1>
+      <form onSubmit={handleSubirArchivo}>
+        <input
+          type="text"
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          placeholder="Título"
+          required
+        />
+        <input type="file" onChange={(e) => setArchivo(e.target.files[0])} required />
+        <button type="submit">Subir Archivo</button>
+      </form>
+      <div className="galeria">
+        {archivos.length > 0 ? (
+          archivos.map((archivo) => (
+            <div key={archivo._id} className="archivo-item">
+              <h3>{archivo.titulo}</h3>
+              {renderArchivo(archivo)}
+              <button onClick={() => eliminarArchivo(archivo._id)}>Eliminar</button>
+            </div>
+          ))
+        ) : (
+          <p>No hay archivos subidos aún.</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Función para eliminar archivos
+const eliminarArchivo = async (id) => {
+  const token = localStorage.getItem("token");
+  if (window.confirm("¿Seguro que quieres eliminar este archivo?")) {
+    try {
+      await axios.delete(`https://backend-noutube.vercel.app/v1/archivos/eliminar/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("Archivo eliminado correctamente");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error al eliminar archivo:", error.response?.data);
+    }
+  }
+};
 
 export default UserHome;

@@ -1,94 +1,85 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
-import './styles/AdminHome.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-function AdminHome() {
-    const [winners, setWinners] = useState([]);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+const AdminHome = () => {
+  const [archivos, setArchivos] = useState([]);
+  const token = localStorage.getItem("token");
 
-    if (!token || role !== 'admin') {
-        return <Navigate to="/" />;
+  useEffect(() => {
+    const obtenerArchivosGenerales = async () => {
+      if (!token) {
+        console.error("Token no encontrado.");
+        return;
+      }
+  
+      try {
+        const { data } = await axios.get("https://backend-noutube.vercel.app/v1/archivos/general", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Archivos obtenidos:", data.archivos);
+        setArchivos(data.archivos || []);
+      } catch (error) {
+        console.error("Error al obtener los archivos generales:", error.response?.data || error.message);
+      }
+    };
+  
+    obtenerArchivosGenerales();
+  }, [token]);
+  
+  const renderArchivo = (archivo) => {
+    const ext = archivo.nombreOriginal.split(".").pop().toLowerCase();
+
+    // Si el archivo es una imagen, lo mostramos con <img>
+    if (ext === "jpg" || ext === "jpeg" || ext === "png" || ext === "gif") {
+      return <img src={archivo.url} alt={archivo.nombreOriginal} style={{ maxWidth: "300px", maxHeight: "300px" }} />;
     }
 
-    useEffect(() => {
-        fetchWinners();
-    }, []);
+    // Si el archivo es un video, lo mostramos con <video>
+    if (ext === "mp4" || ext === "webm" || ext === "ogg") {
+      return (
+        <video width="300" height="300" controls>
+          <source src={archivo.url} type={`video/${ext}`} />
+          Tu navegador no soporta el elemento de video.
+        </video>
+      );
+    }
 
-    const fetchWinners = async () => {
-        try {
-            const response = await fetch('https://backend-gana-como-loco.vercel.app/v1/intentos/usuario', {
-                headers: {
-                    'Authorization': `Bearer ${token}` // Token para autenticar
-                }
-            });
+    // Si el archivo es un audio, lo mostramos con <audio>
+    if (ext === "mp3" || ext === "wav" || ext === "ogg") {
+      return (
+        <audio controls>
+          <source src={archivo.url} type={`audio/${ext}`} />
+          Tu navegador no soporta el elemento de audio.
+        </audio>
+      );
+    }
 
-            if (response.ok) {
-                const data = await response.json();
-                setWinners(data);
-                setError(null); // Resetear error si la llamada es exitosa
-            } else {
-                throw new Error('No se pudo obtener los ganadores');
-            }
-        } catch (error) {
-            console.error('Error al obtener ganadores:', error);
-            setError(error.message); // Guardar mensaje de error
-        }
-    };
-
+    // Otros tipos de archivo: mostramos solo el enlace
     return (
-        <div>
-            <h1>vista de Administrador</h1>
-            <h2>Lista de Ganadores</h2>
-
-            {error && <p className="error">{error}</p>} {/* Mostrar mensaje de error si existe */}
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cédula</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
-                        <th>Ciudad</th> {/* Nueva columna para la ciudad */}
-                        <th>Código</th>
-                        <th>Fecha de Registro</th>
-                        <th>Premio</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {winners.length > 0 ? (
-                        winners.map((winner, index) => (
-                            <tr key={winner.usuario._id}>
-                                <td>{winner.usuario.nombre}</td>
-                                <td>{winner.usuario.cedula || 'N/A'}</td>
-                                <td>{winner.usuario.telefono || 'N/A'}</td>
-                                <td>{winner.usuario.email}</td>
-                                <td>{winner.usuario.ciudad || 'N/A'}</td> {/* Mostrar ciudad */}
-                                <td>{winner.codigo}</td>
-                                <td>{new Date(winner.fecha).toLocaleString()}</td>
-                                <td>{winner.premio}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="8">No hay ganadores registrados.</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-
-            <button onClick={fetchWinners}>Actualizar datos</button>
-
-            <button onClick={() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('role'); // Elimina el rol al cerrar sesión
-                navigate('/');
-            }}>Cerrar Sesión</button>
-        </div>
+      <a href={archivo.url} target="_blank" rel="noopener noreferrer">
+        Ver archivo: {archivo.nombreOriginal}
+      </a>
     );
-}
+  };
+
+  return (
+    <div>
+      <h1>Muro General</h1>
+      <div className="galeria">
+        {archivos.length > 0 ? (
+          archivos.map((archivo) => (
+            <div key={archivo._id} className="archivo-item">
+              <h3>{archivo.titulo}</h3>
+              <p>{archivo.usuario?.nombre || "Desconocido"}</p>
+              {renderArchivo(archivo)}
+            </div>
+          ))
+        ) : (
+          <p>No hay archivos subidos aún.</p>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default AdminHome;
