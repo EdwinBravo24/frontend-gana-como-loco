@@ -29,7 +29,6 @@ const UserHome = () => {
     try {
       await axios.post("https://backend-gana-como-loco.vercel.app/v1/archivos/subir", formData, {
         headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true // Añadido para CORS
       });
       alert("Archivo subido exitosamente");
       setArchivo(null);
