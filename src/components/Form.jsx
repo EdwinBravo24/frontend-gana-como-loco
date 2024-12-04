@@ -10,7 +10,7 @@ function Form({ callback }) {
     const validateUser = async (event) => {
         event.preventDefault();
         try {
-          const response = await fetch("https://backend-noutube.vercel.app/v1/users/login", {
+          const response = await fetch("https://backend-gana-como-loco.vercel.app/v1/users/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

@@ -13,7 +13,7 @@ const AdminHome = () => {
       }
   
       try {
-        const { data } = await axios.get("https://backend-noutube.vercel.app/v1/archivos/general", {
+        const { data } = await axios.get("https://backend-gana-como-loco.vercel.app/v1/archivos/general", {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log("Archivos obtenidos:", data.archivos);
