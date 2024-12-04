@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import './styles/UserHome.css';
 
 const UserHome = () => {
   const [archivos, setArchivos] = useState([]);
