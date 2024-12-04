@@ -1,40 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './styles/NavBar.css';
 
 const NavBar = ({ user, onLogout }) => {
   return (
-    <nav style={{ background: '#2c3e50', padding: '10px' }}>
-      <ul
-        style={{
-          listStyle: 'none',
-          display: 'flex',
-          justifyContent: 'space-around',
-          margin: 0,
-          padding: 0,
-        }}
-      >
+    <nav className="navbar">
+      <ul className="navbar-list">
         {user && (
           <>
-            <li>
-              <Link to="/userHome" style={{ color: 'white', textDecoration: 'none' }}>
+            <li className="navbar-item">
+              <Link to="/userHome" className="navbar-link">
                 Mi Muro
               </Link>
             </li>
-            <li>
-              <Link to="/adminHome" style={{ color: 'white', textDecoration: 'none' }}>
+            <li className="navbar-item">
+              <Link to="/adminHome" className="navbar-link">
                 Muro General
               </Link>
             </li>
-            <li>
-              <button
-                onClick={onLogout}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'white',
-                  cursor: 'pointer',
-                }}
-              >
+            <li className="navbar-item">
+              <button onClick={onLogout} className="navbar-button">
                 Cerrar Sesión
               </button>
             </li>
