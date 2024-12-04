@@ -1,54 +1,29 @@
-/* AdminHome.css */
 .container {
-    padding: 20px;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-  
-  .header button {
-    padding: 10px 20px;
-    font-size: 14px;
-    cursor: pointer;
-    width: 100%;
-    max-width: 200px;
-    margin: 5px 0;
-  }
-  
-  .galeria {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-  }
-  
+  padding: 20px;
+}
+
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.archivo-item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.media {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+}
+
+@media (max-width: 768px) {
   .archivo-item {
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    text-align: center;
+    font-size: 14px;
   }
-  
-  img,
-  video,
-  audio {
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-  }
-  
-  @media (max-width: 768px) {
-    .archivo-item {
-      font-size: 14px;
-    }
-    
-    .header button {
-      width: 100%;
-    }
-  }
-  
+}

@@ -1,7 +1,6 @@
 // adminhome.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './styles/AdminHome.css';
 
 const AdminHome = () => {
   const [archivos, setArchivos] = useState([]);
